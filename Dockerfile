@@ -1,6 +1,11 @@
-FROM python:3.8
-WORKDIR /app
-COPY . /app
-RUN pip install -r requirements.txt
-RUN python manage.py collectstatic --noinput
-CMD uwsgi --http=0.0.0.0:80 --module=quickstart.wsgi
+FROM nginx:latest
+
+# noop for legacy migration
+RUN mkdir /app && \
+    echo "#!/bin/bash" > /app/migrate.sh && \
+    chmod +x /app/migrate.sh
+
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY html /usr/share/nginx/html
+
+EXPOSE 80

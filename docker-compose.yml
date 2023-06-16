@@ -1,28 +1,21 @@
-version: "2.4"
-services:
-  web:
-    # the application's web service (container) will use an image based on our Dockerfile
-    build: "."
-    # map the internal port 80 to port 8000 on the host
-    ports:
-      - "8000:80"
-    # map the host directory to app (which allows us to see and edit files inside the container)
-    volumes:
-      - ".:/app:rw"
-      - "./data:/data:rw"
-    # the default command to run whenever the container is launched
-    command: python manage.py runserver 0.0.0.0:80
-    # the URL 'postgres' or 'mysql' will point to the application's db service
-    links:
-      - "database_default"
-    env_file: .env-local
+# This docker-compose.yml file is used to set up your project in the local
+# development environment *only*. It is *not* used in deployment to our cloud
+# servers, and has no effect whatsoever in cloud deployments.
+#
+# See our Developer Handbook for more information:
+# http://docs.divio.com/en/latest/reference/docker-docker-compose.html
+version: "2"
 
-  database_default:
-    # Select one of the following db configurations for the database
-    image: postgres:13.5-alpine
-    environment:
-      POSTGRES_DB: "db"
-      POSTGRES_HOST_AUTH_METHOD: "trust"
-      SERVICE_MANAGER: "fsm-postgres"
+services:
+  # The web container is an instance of exactly the same Docker image as your
+  # Cloud application container.
+  web:
+    build: .
+    # Change the port if you'd like to expose your project locally on a
+    # different port, for example if you already use port 8000 for
+    # something else.
+    ports:
+    - "8000:80"
     volumes:
-      - ".:/app:rw"
+      - "./nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "./html:/usr/share/nginx/html:ro"
